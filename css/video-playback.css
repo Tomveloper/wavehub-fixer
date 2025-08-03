@@ -1,0 +1,138 @@
+:root {
+	--wf-handle-height-ratio: 0.75;
+	--wf-handle-size: calc(
+		var(--wf-controls-height) * var(--wf-handle-height-ratio)
+	);
+	--wf-controls-height: 32px;
+}
+
+.wf-video-container {
+	overflow: clip;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: rgba(0, 0, 0, 0.5);
+	position: relative;
+	top: 0;
+	left: 0;
+}
+
+.wf-video-loading::before {
+	content: "loading...";
+	position: absolute;
+	z-index: 101;
+	font-size: 32px;
+	color: #fff;
+	text-shadow: 0 2px 2px #000;
+	direction: ltr;
+	top: 50%;
+	left: 50%;
+	translate: -50% -50%;
+	/* display: none; */
+}
+
+.wf-video {
+	max-width: 100%;
+	max-height: 100%;
+	width: auto;
+	height: auto;
+	transition: scale 0.1s, translate 0.1s;
+	cursor: grab;
+}
+
+.wf-video:active {
+	cursor: grabbing;
+	transition: none;
+}
+
+.wf-player-controls-container {
+	position: fixed;
+	background: rgba(0, 0, 0, 0.5);
+	height: var(--wf-controls-height);
+	display: flex;
+	border-radius: 8px;
+	color: #fff;
+	z-index: 1000;
+	width: 75vw;
+	max-width: 1280px;
+}
+
+.wf-player-controls-handle {
+	padding: auto;
+	height: var(--wf-handle-size);
+	width: var(--wf-handle-size);
+	font-size: var(--wf-handle-size);
+	text-align: center;
+	user-select: none;
+	padding: calc(calc(var(--wf-controls-height) - var(--wf-handle-size)) / 2);
+	box-sizing: content-box;
+	line-height: 100%;
+
+	cursor: grab;
+}
+
+.wf-player-controls-handle:active {
+	cursor: grabbing;
+}
+
+.wf-player-controls {
+	display: flex;
+	flex-grow: 1;
+}
+
+/* timeline */
+
+@property --wf-timeline-progress {
+	syntax: "<percentage>";
+	inherits: true;
+	initial-value: 0%;
+}
+
+.wf-player-timeline {
+	flex-grow: 1;
+	margin: 4px 8px;
+	position: relative;
+	user-select: none;
+	cursor: pointer;
+
+	--wf-timeline-progress: 0;
+}
+
+.wf-player-timeline-bar {
+	height: 8px;
+	background: #fff;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	border-radius: 4px;
+
+	width: 100%;
+
+	background: linear-gradient(
+		to right,
+		#fff var(--wf-timeline-progress),
+		rgba(255, 255, 255, 0.5) var(--wf-timeline-progress),
+		rgba(255, 255, 255, 0.5) 100%
+	); /* progress in timeline (0-100%) */
+}
+
+.wf-player-current-time {
+	height: 16px;
+	width: 16px;
+	background: #fff;
+	border-radius: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+
+	left: var(--wf-timeline-progress); /* progress in timeline (0-100%) */
+}
+
+.wf-fullscreen {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 100;
+}

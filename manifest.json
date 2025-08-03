@@ -1,0 +1,32 @@
+{
+	"name": "wavehub fixer",
+	"description": "fixes wavehub (wavehub.co.il)",
+	"version": "1.0",
+	"manifest_version": 3,
+	"action": {
+		"default_popup": "popup.html"
+	},
+	"content_scripts": [
+		{
+			"js": [
+				"scripts/videoHistory.js"
+			],
+			"css": [
+				"css/video-playback.css"
+			],
+			"matches": [
+				"https://wavehub.co.il/vod/*"
+			]
+		}
+	],
+	"web_accessible_resources": [
+		{
+			"matches": [
+				"<all_urls>"
+			],
+			"resources": [
+				"scripts/DOMVerifier.js"
+			]
+		}
+	]
+}
