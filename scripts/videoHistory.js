@@ -72,6 +72,8 @@ async function manageNewPlayer() {
 		`
 	<div class="wf-video-container">
 		<video class="wf-video" autoplay=""></video>
+		<div class="wf-video-action"></div>
+		<div class="wf-video-overlay" style="bottom: 0;left: 4px;">zoom: 100%</div>
 	</div>
 	
 	<div class="wf-player-controls-container" dir="ltr">
@@ -249,10 +251,13 @@ function handleTimeline(timeline, video) {
 	video.addEventListener("durationchange", () => effect.updateTiming({ "duration": video.duration * 1000 }));
 
 	video.addEventListener("waiting", () => { pauseTimelineAnimation(); videoLoading(); });
-	video.addEventListener("pause", () => { pauseTimelineAnimation(); });
-	video.addEventListener("seeking", () => { pauseTimelineAnimation(); });
+	video.addEventListener("pause", () => { pauseTimelineAnimation(); videoAction("paused"); });
+	video.addEventListener("seeking", () => { pauseTimelineAnimation(); videoLoading(); });
+	video.addEventListener("ended", () => { pauseTimelineAnimation(); });
 
-	video.addEventListener("playing", () => { playTimelineAnimation(); } );
+	video.addEventListener("playing", () => { playTimelineAnimation(); });
+	video.addEventListener("play", () => { playTimelineAnimation(); videoAction("resumed"); });
+	video.addEventListener("seeked", () => { videoLoaded(); });
 	//video.addEventListener("play", playTimelineAnimation);
 
 	function videoLoading() {
@@ -261,6 +266,23 @@ function handleTimeline(timeline, video) {
 
 	function videoLoaded() {
 		video.parentElement.classList.remove("wf-video-loading");
+	}
+
+	const videoActionElement = video.parentElement.querySelector(".wf-video-action");
+
+	function videoAction(action) {
+		videoActionElement.innerText = action;
+		videoActionElement.animate(
+			[
+				{ opacity: 1 },
+				{ opacity: 0 }
+			],
+			{
+				fill: "both",
+				duration: 1000,
+				easing: "linear"
+			}
+		)
 	}
 
 	function playTimelineAnimation() {
@@ -277,6 +299,7 @@ function handleTimeline(timeline, video) {
 
 function handleTransformControl(video) {
 	const container = video.parentElement;
+	const zoomOverlay = container.querySelector(".wf-video-overlay");
 
 	let scaling = 1;
 	let videoX = 0;
@@ -300,6 +323,7 @@ function handleTransformControl(video) {
 
 		// make sure video always fills the container by not letting it be scaled below 1
 		scaling = Math.max(1, scaling * multi);
+		zoomOverlay.innerText = `zoom: ${Math.round(scaling * 100)}%`;
 
 
 		// zoom to cursor

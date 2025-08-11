@@ -17,18 +17,29 @@
 	left: 0;
 }
 
-.wf-video-loading::before {
-	content: "loading...";
-	position: absolute;
+.wf-video-overlay, .wf-video-loading::before, .wf-video-action {
+	pointer-events: none;
+	user-select: none;
+	direction: ltr;
 	z-index: 101;
 	font-size: 32px;
 	color: #fff;
 	text-shadow: 0 2px 2px #000;
-	direction: ltr;
+	position: absolute;
+}
+
+.wf-video-loading::before {
+	content: "loading...";
+	top: 50%;
+	left: 50%;
+	translate: -50% -150%;
+}
+
+.wf-video-action {
 	top: 50%;
 	left: 50%;
 	translate: -50% -50%;
-	/* display: none; */
+	opacity: 1;
 }
 
 .wf-video {
@@ -38,6 +49,7 @@
 	height: auto;
 	transition: scale 0.1s, translate 0.1s;
 	cursor: grab;
+	aspect-ratio: 16 / 9;
 }
 
 .wf-video:active {
