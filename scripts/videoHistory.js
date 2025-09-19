@@ -54,7 +54,7 @@ async function trackOriginalPlayer(callback) {
 	function checkPlayer() { // checks if src of original player changes and updates
 
 		let player = main.querySelector("video");
-		if (src == player?.src) return;
+		if (src == player?.src) return; // make sure it is different url
 
 		src = player.src;
 		callback(src);
@@ -86,11 +86,12 @@ async function manageNewPlayer() {
 
 	container.appendChild(player);
 
-	handlePlayerControls(video, playerControls);
+	const videoSwitchHandler = handlePlayerControls(video, playerControls);
 
 
 	trackOriginalPlayer(src => {
 		video.src = src;
+		videoSwitchHandler();
 	});
 }
 
@@ -113,11 +114,11 @@ function handlePlayerControls(video, controls) {
 
 
 	const timeline = controls.querySelector(".wf-player-timeline");
-	handleTimeline(timeline, video);
-
-
+	const videoSwitchHandler = handleTimeline(timeline, video);
 
 	handleTransformControl(video);
+
+	return videoSwitchHandler;
 }
 
 function handleElementDrag(element, handle, startX = 0, startY = 0) {
@@ -187,13 +188,13 @@ function handleTimeline(timeline, video) {
 
 
 
-	const onMouseMove = e => { if (pressingTimeline) updateTimeline(e) };
+	const onMouseMove = e => { if (pressingTimeline) updateTimelineFromMouseEvent(e) };
 
 	timeline.addEventListener('mousedown', e => {
 
 		pressingTimeline = true;
 		pauseTimelineAnimation();
-		updateTimeline(e);
+		updateTimelineFromMouseEvent(e);
 
 		window.addEventListener('mousemove', onMouseMove);
 		window.addEventListener('mouseup', onMouseUp);
@@ -222,8 +223,7 @@ function handleTimeline(timeline, video) {
 	});
 
 
-
-	function updateTimeline(e) {
+	function updateTimelineFromMouseEvent(e) {
 		if (resized) { // if window is resized update position
 			timelinePos = timeline.getBoundingClientRect();
 			resized = false;
@@ -231,10 +231,16 @@ function handleTimeline(timeline, video) {
 
 		currentPercent = (e.clientX - timelinePos.x) / timelinePos.width;
 
-		// update timeline visual/animation
-		if (isNaN(video.duration)) return;
+		updateTimeline(currentPercent)
+	}
 
-		const currentSecond = video.duration * currentPercent;
+	function updateTimeline(percent) {
+
+		// set min duration to 0 (if NaN)
+		const duration = !(video.duration > 0) ? 0 : video.duration;
+
+		// update timeline visual/animation
+		const currentSecond = duration * percent;
 		progressingAnimation.currentTime = currentSecond * 1000; // convert to ms
 	}
 
@@ -294,6 +300,12 @@ function handleTimeline(timeline, video) {
 		progressingAnimation.pause();
 	}
 
+	const videoSwitchHandler = () => {
+		pauseTimelineAnimation();
+		updateTimeline(0);
+	}
+
+	return videoSwitchHandler;
 
 }
 
